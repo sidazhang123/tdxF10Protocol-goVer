@@ -1,11 +1,23 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"tdxF10Protocol/te"
+)
 
 func main() {
-	//211.100.23.200:7779
-
-	err,m:=GetCompanyInfoCategory("211.100.23.200:7779","000001")
-	if err!=nil{fmt.Println(err.Error())}
-	fmt.Printf("%+v",m)
+	api := te.Socket{}
+	api.NewConnectedSocket([]string{})
+	api.Setup()
+	_, m := api.GetCompanyInfoCategory([]string{"000001", "000002"})
+	api.Close()
+	PrettyPrint(m)
+}
+func PrettyPrint(v interface{}) (err error) {
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err == nil {
+		fmt.Println(string(b))
+	}
+	return
 }
