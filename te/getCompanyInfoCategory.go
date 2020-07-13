@@ -47,6 +47,7 @@ func (s *Socket) GetCompanyInfoCategory(codes, ipPool []string) (error, map[stri
 			return err, nil
 		}
 		err, bodybuf := read(s.Client)
+
 		if err != nil {
 			return err, nil
 		}
@@ -70,11 +71,15 @@ func makeCategoryReq(code string) []byte {
 func parseCategory(bodybuf []byte) (error, map[string][]string) {
 
 	num := int(binary.LittleEndian.Uint16(bodybuf[:2]))
+	if num == 0 {
+		return fmt.Errorf("empty body, try another addr"), nil
+	}
 	if len(bodybuf) < num*152+2 {
 		return fmt.Errorf("category body len=%d while %d is required", len(bodybuf), num*152+2), nil
 	}
 	pos := 2
 	category := map[string][]string{}
+
 	for i := 0; i < num; i++ {
 
 		nameb := bodybuf[pos : pos+64]
@@ -89,6 +94,7 @@ func parseCategory(bodybuf []byte) (error, map[string][]string) {
 		category[getStr(nameb)] = []string{getStr(filenameb), strconv.Itoa(int(binary.LittleEndian.Uint32(startb))),
 			strconv.Itoa(int(binary.LittleEndian.Uint32(lengthb)))}
 	}
+	fmt.Printf("%+v", category)
 	return nil, category
 
 }
