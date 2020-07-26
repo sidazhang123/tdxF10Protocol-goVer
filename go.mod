@@ -1,4 +1,4 @@
-module tdxF10Protocol
+module github.com/sidazhang123/tdxF10Protocol-goVer
 
 go 1.13
 

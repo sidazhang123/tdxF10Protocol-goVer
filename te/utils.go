@@ -27,7 +27,7 @@ func GetMarketByte(code string) byte {
 			return market
 		}
 	}
-	return 0
+	return 9
 }
 
 func setup(conn *net.TCPConn, hexStr string) error {

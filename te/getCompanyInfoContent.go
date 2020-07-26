@@ -8,16 +8,18 @@ import (
 	"strconv"
 )
 
-func (s *Socket) GetCompanyInfoContent(code, filename, start, length string) (error, string) {
-	if s.Client == nil {
-		err := s.NewConnectedSocket([]string{})
-		if err != nil {
-			return err, ""
-		}
-		err = s.Setup()
-		if err != nil {
-			return err, ""
-		}
+func (s *Socket) GetCompanyInfoContent(code, filename, start, length string, ipPool []string) (error, string) {
+
+	if ipPool == nil {
+		ipPool = []string{}
+	}
+	err := s.NewConnectedSocket(ipPool)
+	if err != nil {
+		return err, ""
+	}
+	err = s.Setup()
+	if err != nil {
+		return err, ""
 	}
 
 	if len(code) != 6 {
@@ -59,11 +61,7 @@ func makeContentReq(code, filename, start, length string) []byte {
 }
 
 func parseContent(bodybuf []byte) (error, string) {
-	//pos = 0
-	//_, length = struct.unpack(u'<10sH', body_buf[:12])
-	//	pos += 12
-	//	content = body_buf[pos: pos+length]
-	//	return content
+
 	length := int(binary.LittleEndian.Uint16(bodybuf[10:12]))
 
 	b, err := simplifiedchinese.GBK.NewDecoder().Bytes(bodybuf[12 : 12+length])

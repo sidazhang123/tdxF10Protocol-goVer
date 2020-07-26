@@ -23,17 +23,20 @@ import (
 }
 */
 
-func (s *Socket) GetCompanyInfoCategory(codes []string) (error, map[string]map[string][]string) {
-	if s.Client == nil {
-		err := s.NewConnectedSocket([]string{})
-		if err != nil {
-			return err, nil
-		}
-		err = s.Setup()
-		if err != nil {
-			return err, nil
-		}
+func (s *Socket) GetCompanyInfoCategory(codes, ipPool []string) (error, map[string]map[string][]string) {
+
+	if ipPool == nil {
+		ipPool = []string{}
 	}
+	err := s.NewConnectedSocket(ipPool)
+	if err != nil {
+		return err, nil
+	}
+	err = s.Setup()
+	if err != nil {
+		return err, nil
+	}
+
 	ret := map[string]map[string][]string{}
 	for _, code := range codes {
 
@@ -47,7 +50,7 @@ func (s *Socket) GetCompanyInfoCategory(codes []string) (error, map[string]map[s
 		if err != nil {
 			return err, nil
 		}
-		err, category := parseResponse(bodybuf)
+		err, category := parseCategory(bodybuf)
 		if err != nil {
 			return err, nil
 		}
@@ -64,7 +67,7 @@ func makeCategoryReq(code string) []byte {
 	return req
 }
 
-func parseResponse(bodybuf []byte) (error, map[string][]string) {
+func parseCategory(bodybuf []byte) (error, map[string][]string) {
 
 	num := int(binary.LittleEndian.Uint16(bodybuf[:2]))
 	if len(bodybuf) < num*152+2 {

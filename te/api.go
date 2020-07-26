@@ -2,6 +2,7 @@ package te
 
 import (
 	"net"
+	"time"
 )
 
 type Socket struct {
@@ -31,6 +32,7 @@ func (s *Socket) NewConnectedSocket(addrs []string) (err error) {
 					s.Client = api
 					return err
 				}
+				time.Sleep(1 * time.Second)
 			}
 		}
 	}
