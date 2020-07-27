@@ -1,4 +1,4 @@
-package te
+package tdxF10Protocol_goVer
 
 import (
 	"net"
@@ -12,7 +12,9 @@ type Socket struct {
 
 func (s *Socket) NewConnectedSocket(addrs []string) (err error) {
 	if s.Client != nil {
-		s.Client.Close()
+		if err := s.Client.Close(); err != nil {
+			return err
+		}
 	}
 	if len(addrs) == 0 {
 		s.Addrs = []string{"218.75.75.20:7709", "211.100.23.200:7779", "58.49.110.76:7709", "101.71.255.135:7709", "211.100.23.202:7709"}
@@ -39,6 +41,6 @@ func (s *Socket) NewConnectedSocket(addrs []string) (err error) {
 	return
 }
 
-func (s *Socket) Close() {
-	s.Client.Close()
+func (s *Socket) Close() error {
+	return s.Client.Close()
 }

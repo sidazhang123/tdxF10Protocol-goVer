@@ -1,12 +1,12 @@
-package te
+package tdxF10Protocol_goVer
 
 import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
-	"fmt"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"sort"
+	"strings"
 )
 
 // derived from get_security_list() in pytdx
@@ -19,11 +19,10 @@ func (s *Socket) GetCodeNameMap(ipPool []string) (error, map[string]string) {
 	if ipPool == nil {
 		ipPool = []string{"211.100.23.200:7779", "58.49.110.76:7709", "101.71.255.135:7709", "211.100.23.202:7709", "218.75.75.20:7709"}
 	}
-	ret := []map[string]string{}
+	var ret []map[string]string
 	for _, ip := range ipPool {
 		_ = newSocket(s, ip)
 		codeNameMap := map[string]string{}
-		fmt.Println(ip)
 		for market := 0; market < 2; market++ {
 			pos := 0
 			for {
@@ -39,15 +38,12 @@ func (s *Socket) GetCodeNameMap(ipPool []string) (error, map[string]string) {
 					return err, nil
 				}
 				if len(codeName) == 0 {
-					fmt.Println(pos)
 					break
 				} else {
-					extendMap(codeNameMap, codeName)
 					pos += len(codeName)
 				}
-
+				extendMap(codeNameMap, codeName, market)
 			}
-			//if market==0{fmt.Println("hey")}
 		}
 		ret = append(ret, codeNameMap)
 	}
@@ -56,13 +52,22 @@ func (s *Socket) GetCodeNameMap(ipPool []string) (error, map[string]string) {
 	})
 	return nil, ret[0]
 }
-
-func extendMap(o, n map[string]string) {
+func isInterested(market int, code string) bool {
+	shSz := map[string]int{"600": 1, "601": 1, "603": 1, "000": 0, "001": 0, "002": 0, "300": 0}
+	for preCode, preMarket := range shSz {
+		if strings.HasPrefix(code, preCode) && preMarket == market {
+			return true
+		}
+	}
+	return false
+}
+func extendMap(o, n map[string]string, market int) {
 	for k, v := range n {
-		o[k] = v
+		if isInterested(market, k) {
+			o[k] = strings.Replace(v, " ", "", -1)
+		}
 	}
 }
-
 func newSocket(s *Socket, ip string) error {
 	err := s.NewConnectedSocket([]string{ip})
 	if err != nil {
@@ -79,6 +84,8 @@ func makeCodenameReq(market, start int) []byte {
 
 	//pkg.extend(struct.pack(u"<H6sH80sIII", market, code, 0, filename, start, length, 0))
 	req, _ := hex.DecodeString("0c0118640101060006005004") //header
+	marketb := make([]byte, 2)
+	binary.LittleEndian.PutUint16(marketb, uint16(market)) //market
 	req = append(req, []byte{byte(market), 0}...)
 	startb := make([]byte, 2)
 	binary.LittleEndian.PutUint16(startb, uint16(start)) //start
@@ -89,7 +96,7 @@ func makeCodenameReq(market, start int) []byte {
 func parseCodename(bodybuf []byte) (error, map[string]string) {
 
 	num := int(binary.LittleEndian.Uint16(bodybuf[:2]))
-	println(num)
+
 	pos := 2
 	codename := map[string]string{}
 	for i := 0; i < num; i++ {
@@ -101,13 +108,7 @@ func parseCodename(bodybuf []byte) (error, map[string]string) {
 			return err, nil
 		}
 		pos += 29
-		if string([]rune(code)[0]) == "6" {
-			println(code)
-		}
-		if GetMarketByte(code) != 9 {
-			codename[code] = string(name)
-		}
-
+		codename[code] = string(name)
 	}
 	return nil, codename
 

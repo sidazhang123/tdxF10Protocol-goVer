@@ -1,4 +1,4 @@
-package te
+package tdxF10Protocol_goVer
 
 import (
 	"encoding/binary"

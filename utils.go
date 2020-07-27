@@ -1,4 +1,4 @@
-package te
+package tdxF10Protocol_goVer
 
 import (
 	"bytes"
@@ -59,7 +59,7 @@ func read(conn *net.TCPConn) (error, []byte) {
 	zipsize := int(binary.LittleEndian.Uint16(h[12:14]))
 
 	//read body
-	body := []byte{}
+	var body []byte
 	for {
 		b := make([]byte, zipsize)
 		_, e := io.ReadFull(conn, b)
@@ -72,7 +72,6 @@ func read(conn *net.TCPConn) (error, []byte) {
 		} else {
 			break
 		}
-
 	}
 	//(unzip)
 	if zipsize != unzipsize {
@@ -91,9 +90,11 @@ func decompress(data []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer z.Close()
 	p, err := ioutil.ReadAll(z)
 	if err != nil {
+		return nil, err
+	}
+	if err := z.Close(); err != nil {
 		return nil, err
 	}
 	return p, nil
