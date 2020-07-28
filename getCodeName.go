@@ -17,7 +17,7 @@ func (s *Socket) GetCodeNameMap(ipPool []string) (error, map[string]string) {
 		Because it is patently fast, get the lists from all the addrs and return the longest.
 	*/
 	if ipPool == nil {
-		ipPool = []string{"211.100.23.200:7779", "58.49.110.76:7709", "101.71.255.135:7709", "211.100.23.202:7709", "218.75.75.20:7709"}
+		ipPool = []string{"211.100.23.200:7779", "58.49.110.76:7709", "211.100.23.202:7709"}
 	}
 	var ret []map[string]string
 	for _, ip := range ipPool {
