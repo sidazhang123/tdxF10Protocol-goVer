@@ -29,16 +29,27 @@ This is the golang version of pytdx subject to limited implementations for perso
 	}
 ```
 {
+
   "000001": "平安银行",
+  
   "000002": "万科Ａ",
+  
   "000004": "国农科技",
+  
   "000005": "世纪星源",
+  
   "000006": "深振业Ａ",
+  
   "000007": "全新好",
+  
   "000008": "神州高铁",
+  
   "000009": "中国宝安",
+  
   ...
+  
   **codename len = 3775**
+
   **GetCodeNameMap took 7.0307578s**
   
 ```
@@ -48,31 +59,55 @@ This is the golang version of pytdx subject to limited implementations for perso
     if err != nil {
         fmt.Println(err.Error())
     }
-    _ = PrettyPrint(category)
+    _ = PrettyPrint(category) 
 ```
+
  "600000": {
-    "业内点评": [
-      "600000.txt", //filename
-      "275723", //start_pos
-      "4539"  //length
-    ],
-    "主力追踪": [
-      "600000.txt",
-      "225153",
-      "10241"
-    ],
-    "公司大事": [
-      "600000.txt",
-      "115728",
-      "79201"
-    ],
-    "公司报导": [
-      "600000.txt",
-      "74669",
-      "22882"
-      ...
-    **category len = 3775**
-    **GetCompanyInfoCategory took 2m6.4742127s**
+ 
+"业内点评": [
+
+"600000.txt", //filename
+
+"275723", //start_pos
+
+"4539"  //length
+
+],
+
+"主力追踪": [
+
+"600000.txt",
+
+"225153",
+
+"10241"
+
+],
+
+"公司大事": [
+
+"600000.txt",
+
+"115728",
+
+"79201"
+
+],
+
+"公司报导": [
+
+"600000.txt",
+
+"74669",
+
+"22882"
+
+...
+
+**category len = 3775**
+
+**GetCompanyInfoCategory took 2m6.4742127s**
+    
 ```
 	// get the specific content
     // avoid being coupled with the return type of GetCompanyInfoCategory, you can impl a retry mech likewise by yourself.
@@ -90,6 +125,7 @@ This is the golang version of pytdx subject to limited implementations for perso
 
 }
 ```
+
 ☆经营分析☆ ◇600000 浦发银行 更新日期：2020-07-16◇ 港澳资讯 灵通V7.0
 ★本栏包括【1.主营业务】【2.主营构成分析】【3.经营投资】【4.关联企业经营状况】★
 
@@ -100,5 +136,7 @@ This is the golang version of pytdx subject to limited implementations for perso
 【2.主营构成分析】
 【截止日期】2019-12-31
 项目名                        营业收入    营业利润   毛利率(%)  占主营业务
+
 ...
+
 **GetCompanyInfoContent took 174.5871ms**
