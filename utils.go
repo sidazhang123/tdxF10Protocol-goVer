@@ -9,11 +9,12 @@ import (
 	"io/ioutil"
 	"net"
 	"strings"
+	"time"
 )
 
-func (s *Socket) Setup() (err error) {
+func (s *Socket) setup() (err error) {
 	for _, setupStr := range []string{"0c0218930001030003000d0001", "0c0218940001030003000d0002", "0c031899000120002000db0fd5d0c9ccd6a4a8af0000008fc22540130000d500c9ccbdf0d7ea00000002"} {
-		if err := setup(s.Client, setupStr); err != nil {
+		if err := _setup(s.Client, setupStr, s.Timeout); err != nil {
 			return err
 		}
 	}
@@ -30,7 +31,7 @@ func GetMarketByte(code string) byte {
 	return 9
 }
 
-func setup(conn *net.TCPConn, hexStr string) error {
+func _setup(conn *net.TCPConn, hexStr string, timeout int) error {
 	req, err := hex.DecodeString(hexStr)
 	if err != nil {
 		return err
@@ -39,18 +40,19 @@ func setup(conn *net.TCPConn, hexStr string) error {
 	if err != nil {
 		return err
 	}
-	err, _ = read(conn)
+	err, _ = read(conn, timeout)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func read(conn *net.TCPConn) (error, []byte) {
+func read(conn *net.TCPConn, timeout int) (error, []byte) {
+	_ = conn.SetReadDeadline(time.Now().Add(time.Duration(timeout) * time.Second))
 	//read header
 	h := make([]byte, 16)
-	_, err := io.ReadFull(conn, h)
-	if err != nil {
+	n, err := io.ReadFull(conn, h)
+	if err != nil || n != 16 {
 		return err, nil
 	}
 	//get zipsize&unzipsize

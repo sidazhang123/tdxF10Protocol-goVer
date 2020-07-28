@@ -29,7 +29,7 @@ func (s *Socket) GetCodeNameMap(ipPool []string) (error, map[string]string) {
 				if _, err := s.Client.Write(makeCodenameReq(market, pos)); err != nil {
 					return err, nil
 				}
-				err, bodybuf := read(s.Client)
+				err, bodybuf := read(s.Client, s.Timeout)
 				if err != nil {
 					return err, nil
 				}
@@ -69,11 +69,11 @@ func extendMap(o, n map[string]string, market int) {
 	}
 }
 func newSocket(s *Socket, ip string) error {
-	err := s.NewConnectedSocket([]string{ip})
+	err := s.NewConnectedSocket(ip)
 	if err != nil {
 		return err
 	}
-	err = s.Setup()
+	err = s.setup()
 	if err != nil {
 		return err
 	}
@@ -109,6 +109,7 @@ func parseCodename(bodybuf []byte) (error, map[string]string) {
 		}
 		pos += 29
 		codename[code] = string(name)
+
 	}
 	return nil, codename
 

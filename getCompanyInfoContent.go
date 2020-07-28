@@ -8,16 +8,13 @@ import (
 	"strconv"
 )
 
-func (s *Socket) GetCompanyInfoContent(code, filename, start, length string, ipPool []string) (error, string) {
+func (s *Socket) GetCompanyInfoContent(code, filename, start, length string) (error, string) {
 
-	if ipPool == nil {
-		ipPool = []string{}
-	}
-	err := s.NewConnectedSocket(ipPool)
+	err := s.NewConnectedSocket("")
 	if err != nil {
 		return err, ""
 	}
-	err = s.Setup()
+	err = s.setup()
 	if err != nil {
 		return err, ""
 	}
@@ -28,7 +25,7 @@ func (s *Socket) GetCompanyInfoContent(code, filename, start, length string, ipP
 	if _, err := s.Client.Write(makeContentReq(code, filename, start, length)); err != nil {
 		return err, ""
 	}
-	err, bodybuf := read(s.Client)
+	err, bodybuf := read(s.Client, s.Timeout)
 	if err != nil {
 		return err, ""
 	}

@@ -23,41 +23,74 @@ import (
 }
 */
 
-func (s *Socket) GetCompanyInfoCategory(codes, ipPool []string) (error, map[string]map[string][]string) {
-
-	if ipPool == nil {
-		ipPool = []string{}
-	}
-	err := s.NewConnectedSocket(ipPool)
-	if err != nil {
-		return err, nil
-	}
-	err = s.Setup()
-	if err != nil {
-		return err, nil
+func (s *Socket) GetCompanyInfoCategory(codeSlice []string) (error, map[string]map[string][]string) {
+	// handy for removal
+	codes := map[string]bool{}
+	for _, c := range codeSlice {
+		codes[c] = true
 	}
 
 	ret := map[string]map[string][]string{}
-	for _, code := range codes {
 
-		if len(code) != 6 {
-			return fmt.Errorf("corrupted code in category"), nil
-		}
-		if _, err := s.Client.Write(makeCategoryReq(code)); err != nil {
-			return err, nil
-		}
-		err, bodybuf := read(s.Client)
-
-		if err != nil {
-			return err, nil
-		}
-		err, category := parseCategory(bodybuf)
-		if err != nil {
-			return err, nil
-		}
-		ret[code] = category
+	var bodybuf []byte
+	var err error
+	var category map[string][]string
+	// try with each of the ipPool for one time; return
+	var maxRetry int
+	if s.MaxRetry == 0 {
+		maxRetry = len(s.Addrs)
+	} else {
+		maxRetry = s.MaxRetry
 	}
-	return nil, ret
+	for i := 0; i < maxRetry; i++ {
+		var success []string
+		err = s.NewConnectedSocket("")
+		if err != nil {
+			fmt.Println("new sock err")
+			continue
+		}
+		err = s.setup()
+		if err != nil {
+			fmt.Println("setup err")
+			continue
+		}
+		for code := range codes {
+			if len(code) != 6 {
+				return fmt.Errorf("corrupted code in category"), nil
+			}
+
+			_, err = s.Client.Write(makeCategoryReq(code))
+			if err != nil {
+				continue
+			}
+			err, bodybuf = read(s.Client, s.Timeout)
+			if err != nil {
+				continue
+			}
+			err, category = parseCategory(bodybuf)
+			if err != nil {
+				continue
+			}
+			ret[code] = category
+			success = append(success, code)
+		}
+
+		for _, f := range success {
+			delete(codes, f)
+		}
+		if len(codes) == 0 {
+			break
+		}
+
+	}
+	if len(codes) != 0 {
+		ec := ""
+		for k := range codes {
+			ec += k + ","
+		}
+		err = fmt.Errorf("getCompanyInfoCategory err in %s", ec)
+	}
+	return err, ret
 }
 
 func makeCategoryReq(code string) []byte {
@@ -94,7 +127,7 @@ func parseCategory(bodybuf []byte) (error, map[string][]string) {
 		category[getStr(nameb)] = []string{getStr(filenameb), strconv.Itoa(int(binary.LittleEndian.Uint32(startb))),
 			strconv.Itoa(int(binary.LittleEndian.Uint32(lengthb)))}
 	}
-	fmt.Printf("%+v", category)
+
 	return nil, category
 
 }
