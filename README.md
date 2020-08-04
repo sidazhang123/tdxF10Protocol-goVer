@@ -21,6 +21,22 @@ This is the golang version of pytdx subject to limited implementations for perso
 ```
 
 ```
+	// an additional method to get code-name mapping from sina referencing from tushare
+	// practically, it is more stable and updates at 13:00 every trading day
+	// while the socket approach does so after the market closes
+	t := time.Now()
+	err,codename:=tdxF10Protocol_goVer.GetCodeNameFromSina()
+	if err!=nil{fmt.Println(err.Error())}
+	fmt.Printf("%+v\ncodename len=%d\n",codename,len(codename))
+	fmt.Printf("GetCodeNameFromSina took %s\n", time.Since(t))
+```
+map[000001:平安银行 000002:万科Ａ 000004:国农科技 000005:世纪星源 000006:深振业Ａ 000007:全新好 000008:神州高铁 
+...
+
+**codename len=3773**
+
+**GetCodeNameFromSina took 14.1598163s**
+```
 	// get code-name mappings
 	// it uses a separate ip pool; nil for default
 	err, codeNameMap := api.GetCodeNameMap(nil)

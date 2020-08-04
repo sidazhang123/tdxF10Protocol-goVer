@@ -8,6 +8,17 @@ import (
 )
 
 func main() {
+	// an additional method to get code-name mapping from sina referencing from tushare
+	// practically, it is more stable and updates at 13:00 every trading day
+	// while the socket approach does so after the market closes
+	t := time.Now()
+	err, codename := tdxF10Protocol_goVer.GetCodeNameFromSina()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Printf("%+v\ncodename len=%d\n", codename, len(codename))
+	fmt.Printf("GetCodeNameFromSina took %s\n", time.Since(t))
+
 	// this mod subjects to codes that start with 000, 001, 002, 300 in sz and, 600, 601, 603 in sh
 	// retry with each ip in the ipPool recursively; MaxRetry=len(Addrs) if 0/undefined
 	api := tdxF10Protocol_goVer.Socket{
@@ -20,7 +31,7 @@ func main() {
 
 	// get code-name mappings
 	// it uses a separate ip pool; nil for default
-	t := time.Now()
+	t = time.Now()
 	err, codeNameMap := api.GetCodeNameMap(nil)
 	if err != nil {
 		println(err.Error())
@@ -28,7 +39,7 @@ func main() {
 
 	fmt.Printf("codename len %d\n", len(codeNameMap))
 	fmt.Printf("GetCodeNameMap took %s\n", time.Since(t))
-	_ = PrettyPrint(codeNameMap)
+	//_ = PrettyPrint(codeNameMap)
 
 	// get fields to fetch the f10 content of given codes
 	// this method applies the retry policy
@@ -42,7 +53,7 @@ func main() {
 		fmt.Println(err.Error())
 	}
 
-	_ = PrettyPrint(category)
+	//_ = PrettyPrint(category)
 	fmt.Printf("category len %d\n", len(category))
 	fmt.Printf("GetCompanyInfoCategory took %s\n", time.Since(t))
 
