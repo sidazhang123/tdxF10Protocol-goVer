@@ -156,3 +156,19 @@ map[000001:平安银行 000002:万科Ａ 000004:国农科技 000005:世纪星源
 ...
 
 **GetCompanyInfoContent took 174.5871ms**
+
+
+**Getting content in 4 categories of all codes typically takes 15min with a routine pool of 10 workers.**
+
+```
+p.Submit(
+	func() {
+		api := tdxF10Protocol_goVer.Socket{
+			MaxRetry: 0,
+			Timeout: 10,
+			}
+        api.Init(nil, 0)
+        err, info := api.GetCompanyInfoContent()
+```
+
+**While doing so for the other methods slows the process.**
