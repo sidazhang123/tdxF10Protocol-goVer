@@ -46,12 +46,12 @@ func (s *Socket) GetCompanyInfoCategory(codeSlice []string) (error, map[string]m
 		var success []string
 		err = s.NewConnectedSocket("")
 		if err != nil {
-			fmt.Println("new sock err")
+			//fmt.Println("new sock err: "+err.Error())
 			continue
 		}
 		err = s.setup()
 		if err != nil {
-			fmt.Println("setup err")
+			//fmt.Println("setup err: "+err.Error())
 			continue
 		}
 		for code := range codes {

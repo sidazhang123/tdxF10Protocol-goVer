@@ -9,32 +9,41 @@ import (
 )
 
 func (s *Socket) GetCompanyInfoContent(code, filename, start, length string) (error, string) {
+	var maxRetry int
+	if s.MaxRetry == 0 {
+		maxRetry = len(s.Addrs)
+	} else {
+		maxRetry = s.MaxRetry
+	}
+	var err error
+	for i := 0; i < maxRetry; i++ {
+		err = s.NewConnectedSocket("")
+		if err != nil {
+			continue
+		}
+		err = s.setup()
+		if err != nil {
+			continue
+		}
 
-	err := s.NewConnectedSocket("")
-	if err != nil {
-		return err, ""
-	}
-	err = s.setup()
-	if err != nil {
-		return err, ""
-	}
+		if len(code) != 6 {
+			return fmt.Errorf("corrupted code in category"), ""
+		}
+		if _, err := s.Client.Write(makeContentReq(code, filename, start, length)); err != nil {
+			return err, ""
+		}
+		err, bodybuf := read(s.Client, s.Timeout)
+		if err != nil {
+			continue
+		}
+		err, content := parseContent(bodybuf)
+		if err != nil {
+			continue
+		}
 
-	if len(code) != 6 {
-		return fmt.Errorf("corrupted code in category"), ""
+		return nil, content
 	}
-	if _, err := s.Client.Write(makeContentReq(code, filename, start, length)); err != nil {
-		return err, ""
-	}
-	err, bodybuf := read(s.Client, s.Timeout)
-	if err != nil {
-		return err, ""
-	}
-	err, content := parseContent(bodybuf)
-	if err != nil {
-		return err, ""
-	}
-
-	return nil, content
+	return err, ""
 }
 
 func makeContentReq(code, filename, start, length string) []byte {
