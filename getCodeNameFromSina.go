@@ -23,7 +23,7 @@ gbk
 return map[string]string  :: with no
 */
 var url = "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?num=200&sort=code&asc=0&node=%s&symbol=&_s_r_a=page&page=%d"
-var preset = map[string]bool{"600": false, "601": false, "603": false, "000": false, "001": false, "002": false, "300": false}
+var preset = map[string]bool{"600": false, "601": false, "603": false, "605": false, "000": false, "001": false, "002": false, "300": false}
 
 func u2s(from string) (to string, err error) {
 	a := regexp.MustCompile(`^([^\\]*)\\u`).FindStringSubmatch(from)
@@ -45,7 +45,7 @@ func u2s(from string) (to string, err error) {
 		return
 	}
 	for i, bl, br, r := 0, len(bs), bytes.NewReader(bs), uint16(0); i < bl; i += 2 {
-		binary.Read(br, binary.BigEndian, &r)
+		_ = binary.Read(br, binary.BigEndian, &r)
 		to += string(r)
 	}
 
