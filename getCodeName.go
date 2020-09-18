@@ -53,7 +53,7 @@ func (s *Socket) GetCodeNameMap(ipPool []string) (error, map[string]string) {
 	return nil, ret[0]
 }
 func isInterested(market int, code string) bool {
-	shSz := map[string]int{"600": 1, "601": 1, "603": 1, "605": 1, "000": 0, "001": 0, "002": 0, "300": 0}
+	shSz := map[string]int{"600": 1, "601": 1, "603": 1, "605": 1, "000": 0, "001": 0, "002": 0, "003": 0, "300": 0}
 	for preCode, preMarket := range shSz {
 		if strings.HasPrefix(code, preCode) && preMarket == market {
 			return true

@@ -22,7 +22,7 @@ func (s *Socket) setup() (err error) {
 }
 
 func GetMarketByte(code string) byte {
-	shSz := map[string]byte{"600": byte(1), "601": byte(1), "603": byte(1), "605": byte(1), "000": byte(0), "001": byte(0), "002": byte(0), "300": byte(0)}
+	shSz := map[string]byte{"600": byte(1), "601": byte(1), "603": byte(1), "605": byte(1), "000": byte(0), "001": byte(0), "002": byte(0), "003": byte(0), "300": byte(0)}
 	for k, market := range shSz {
 		if strings.HasPrefix(code, k) {
 			return market
