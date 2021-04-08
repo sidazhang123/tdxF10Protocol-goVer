@@ -3,16 +3,19 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sidazhang123/tdxF10Protocol-goVer"
+	tdxF10Protocol_goVer "github.com/sidazhang123/tdxF10Protocol-goVer"
 	"time"
 )
 
 func main() {
+
 	// an additional method to get code-name mapping from sina referencing from tushare
 	// practically, it is more stable and updates at 13:00 every trading day
 	// while the socket approach does so after the market closes
 	t := time.Now()
 	err, codename := tdxF10Protocol_goVer.GetCodeNameFromSina()
+	//err, codename := tdxF10Protocol_goVer.GetCodeNameFromWaditu("")
+
 	if err != nil {
 		fmt.Println(err.Error())
 	}

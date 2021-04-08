@@ -22,7 +22,7 @@ re code,name fields
 gbk
 return map[string]string  :: with no
 */
-var url = "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?num=200&sort=code&asc=0&node=%s&symbol=&_s_r_a=page&page=%d"
+var sina = "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?num=200&sort=code&asc=0&node=%s&symbol=&_s_r_a=page&page=%d"
 var preset = map[string]bool{"600": false, "601": false, "603": false, "605": false, "000": false, "001": false, "002": false, "003": false, "300": false}
 
 func u2s(from string) (to string, err error) {
@@ -59,9 +59,9 @@ func GetCodeNameFromSina() (error, map[string]string) {
 	for page := 0; page < 60; page++ {
 
 		if page == 0 {
-			_url = fmt.Sprintf(url, "shfxjs", 1)
+			_url = fmt.Sprintf(sina, "shfxjs", 1)
 		} else {
-			_url = fmt.Sprintf(url, "hs_a", page)
+			_url = fmt.Sprintf(sina, "hs_a", page)
 		}
 		resp, err := http.Get(_url)
 		if err != nil || resp == nil {
